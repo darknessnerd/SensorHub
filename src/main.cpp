@@ -19,7 +19,8 @@ const char* password = STAPSK;
 
 ESP8266WebServer httpServer(80);
 ESP8266HTTPUpdateServer httpUpdater;
-
+int Status = 12;  // Digital pin D6
+int sensor = 13;  // Digital pin D7
 void setup(void) {
 
   Serial.begin(115200);
@@ -27,7 +28,8 @@ void setup(void) {
   Serial.println("Booting Sketch...");
   WiFi.mode(WIFI_AP_STA);
   WiFi.begin(ssid, password);
-
+  pinMode(sensor, INPUT);   // declare sensor as input
+  pinMode(Status, OUTPUT);  // declare LED as output
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
     WiFi.begin(ssid, password);
     Serial.println("WiFi failed, retrying.");
@@ -48,4 +50,16 @@ void setup(void) {
 void loop(void) {
   httpServer.handleClient();
   MDNS.update();
+
+  long state = digitalRead(sensor);
+    if(state == HIGH) {
+      digitalWrite (Status, HIGH);
+      Serial.println("Motion detected!");
+      delay(1000);
+    }
+    else {
+      digitalWrite (Status, LOW);
+      Serial.println("Motion absent!");
+      delay(1000);
+      }
 }
