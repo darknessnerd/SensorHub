@@ -7,7 +7,7 @@
 
 #ifndef STASSID
 #define STASSID "test"
-#define STAPSK  "crinitiw"
+#define STAPSK  ""
 #endif
 
 WiFiClient espClient;
