@@ -21,45 +21,58 @@ ESP8266WebServer httpServer(80);
 ESP8266HTTPUpdateServer httpUpdater;
 int Status = 12;  // Digital pin D6
 int sensor = 13;  // Digital pin D7
+
+//initial state
+long state = -1;
+
+
 void setup(void) {
 
-  Serial.begin(115200);
-  Serial.println();
-  Serial.println("Booting Sketch...");
-  WiFi.mode(WIFI_AP_STA);
-  WiFi.begin(ssid, password);
-  pinMode(sensor, INPUT);   // declare sensor as input
-  pinMode(Status, OUTPUT);  // declare LED as output
-  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    WiFi.begin(ssid, password);
-    Serial.println("WiFi failed, retrying.");
-    delay(1000);
-  }
+        Serial.begin(115200);
+        Serial.println();
+        Serial.println("Booting Sketch...");
+        WiFi.mode(WIFI_AP_STA);
+        WiFi.begin(ssid, password);
+        pinMode(sensor, INPUT); // declare sensor as input
+        pinMode(Status, OUTPUT); // declare LED as output
+        while (WiFi.waitForConnectResult() != WL_CONNECTED) {
+                WiFi.begin(ssid, password);
+                Serial.println("WiFi failed, retrying.");
+                delay(1000);
+        }
 
-  MDNS.begin(host);
+        MDNS.begin(host);
 
-  httpUpdater.setup(&httpServer);
-  httpServer.begin();
+        httpUpdater.setup(&httpServer);
+        httpServer.begin();
 
-  MDNS.addService("http", "tcp", 80);
-  Serial.printf("HTTPUpdateServer ready! Open http://%s.local/update in your browser\n", host);
+        MDNS.addService("http", "tcp", 80);
+        Serial.printf("HTTPUpdateServer ready! Open http://%s.local/update in your browser\n", host);
 
 
 }
 
 void loop(void) {
-  httpServer.handleClient();
-  MDNS.update();
+        httpServer.handleClient();
+        MDNS.update();
 
-  long state = digitalRead(sensor);
-    if(state == HIGH) {
-      digitalWrite (Status, HIGH);
-      Serial.println("Motion detected!");
-      delay(1000);
-    }
-    else {
-      digitalWrite (Status, LOW);
-      Serial.println("Motion absent!");
-      delay(1000);
-      }
+        long newState = digitalRead(sensor);
+        if(newState == HIGH) {
+                digitalWrite (Status, HIGH);
+                Serial.println("Motion detected!");
+                delay(1000);
+        }
+        else {
+                digitalWrite (Status, LOW);
+                Serial.println("Motion absent!");
+                delay(1000);
+        }
+
+        if(newState != state) {
+
+                //TODO SEND
+                Serial.printf("SEND %d\n", newState);
+                state = newState;
+        }
+
 }
