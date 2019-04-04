@@ -24,7 +24,7 @@ const char* password = STAPSK;
 ESP8266WebServer httpServer(80);
 ESP8266HTTPUpdateServer httpUpdater;
 int sensor = 13;  // Digital pin D7
-
+const int lightPin = A0;
 //initial state
 long state = -1;
 // Initialize the OLED display using Wire library
@@ -89,6 +89,9 @@ display.clear();
                   display.setTextAlignment(TEXT_ALIGN_RIGHT);
                 display.drawString(130, 40, "Send State!");
         }
+        int level = analogRead(lightPin);
+        String l= "Light level:"+ String(level);
+        display.drawString(115, 5, l );
         display.setTextAlignment(TEXT_ALIGN_RIGHT);
 
   // write the buffer to the display
